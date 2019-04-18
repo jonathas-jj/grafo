@@ -17,10 +17,10 @@
 #include <iostream>
 #include <iterator>
 
-
-
 #define grafoMatriz 1
 #define grafoLista  2
+
+
 using namespace std;
 
 Grafo::Grafo(int tipoDeGrafo) {

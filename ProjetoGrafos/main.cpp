@@ -13,8 +13,10 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-#include <jsoncpp/json/json.h> 
+#include <jsoncpp/json/json.h> //biblioteca de manipulação de arquivos json
 #include "Grafo.h"
+#include <fstream>  
+
 using namespace std;
 
 /*
@@ -23,23 +25,30 @@ using namespace std;
 
 int main() {
     Grafo *g1 = new Grafo(grafoMatriz);// grafo do tipo matriz
-    Json::Value val;
     Grafo *g2 = new Grafo(grafoLista);// grafo do tipo lista
     int n=0, v1=0,v2=0; // numero de vertices . Vértice 1 e vértice 2 da aresta
+    fstream arq("dados/grafoN5.json");
+    Json::Value raiz;
+    
+    arq >> raiz;
+    cout << raiz["nome"];
     
     
-    cout << "digite o numero de vértices " << endl ;
-    cin >> n;
-    g1->criaGrafo(n,0,NULL); // cria grafo com 0 arestas
-    cout << "digite as arestas separadas por espaços.Quando acabar, ou se não houver aresta, digite -1 ." << endl ;
-    cin >> v1 ;
-    while(v1!=-1){
-        cin >> v2;
-
-        g1->insereAresta(v1,v2);
-                
-        cin >> v1 ;
-    }
+    
+    
+    
+//    cout << "digite o numero de vértices " << endl ;
+//    cin >> n;
+//    g1->criaGrafo(n,0,NULL); // cria grafo com 0 arestas
+//    cout << "digite as arestas separadas por espaços.Quando acabar, ou se não houver aresta, digite -1 ." << endl ;
+//    cin >> v1 ;
+//    while(v1!=-1){
+//        cin >> v2;
+//
+//        g1->insereAresta(v1,v2);
+//                
+//        cin >> v1 ;
+//    }
       cout << *g1 ;
     
     return 0;

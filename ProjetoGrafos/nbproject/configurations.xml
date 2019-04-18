@@ -40,8 +40,13 @@
       </toolsSet>
       <compileType>
         <ccTool>
-          <standard>11</standard>
+          <stripSymbols>true</stripSymbols>
+          <standard>8</standard>
         </ccTool>
+        <linkerTool>
+          <additionalDep>-ljsoncpp</additionalDep>
+          <commandLine>-ljsoncpp</commandLine>
+        </linkerTool>
       </compileType>
       <item path="Grafo.cpp" ex="false" tool="1" flavor2="0">
       </item>

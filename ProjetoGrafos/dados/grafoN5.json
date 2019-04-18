@@ -1,5 +1,5 @@
 {
-    "name": "Grafo_Matriz_jonathas_n5",
+    "nome": "Grafo_Matriz_jonathas_n5",
     "vertices":["1","2","3","4","5"],
     "arestas":[["1","2"],["2","3"],["5","4"]]
     
