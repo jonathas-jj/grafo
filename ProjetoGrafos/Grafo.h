@@ -34,7 +34,8 @@ public:
     vector<int> buscaEmLargura();
     vector<int> BuscaEmProfundidade();
     friend ostream& operator<<(ostream& strm,  Grafo& g);
-   
+    void vertVizinhos();
+    
     int tipoGrafo;
  
 private:

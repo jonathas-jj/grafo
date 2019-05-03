@@ -103,7 +103,7 @@ void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas){
         }
          //preenhe matriz cm arestas.
         for (int i = 0; i < mArestas; i++){
-            int verticeA = arestas[i][1], verticeB = arestas[i][2];
+            int verticeA = arestas[i][0], verticeB = arestas[i][1];
             //preenche apenas a parte de cima da matriz
             if(verticeA <= verticeB){ 
                 this->matriz[verticeA][verticeB] = 1 ;
@@ -119,7 +119,7 @@ void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas){
         //conectados a eles.
         //preenhe matriz cm arestas.
         for(int i = 0; i < mArestas; i++ ){
-             int verticeA = arestas[i][1], verticeB = arestas[i][2];
+             int verticeA = arestas[i][0], verticeB = arestas[i][1];
             this->listaAdj[verticeA].push_back(verticeB) ;
             this->listaAdj[verticeB].push_back(verticeA) ;
         }
@@ -136,6 +136,7 @@ vector<int> Grafo::buscaEmLargura(){
     
     return saida;
 }
+
 vector<int> Grafo::BuscaEmProfundidade(){
     
 }
@@ -163,7 +164,12 @@ string Grafo::imprimeGrafo(){
     return s;
 }
 
+
 ostream& operator<<(ostream& strm,  Grafo &g) {
     strm << g.imprimeGrafo();
     return strm ;
+}
+
+void Grafo::vertVizinhos(){
+    
 }

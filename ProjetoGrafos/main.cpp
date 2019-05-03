@@ -22,19 +22,35 @@ using namespace std;
 /*
  * 
  */
+void abreArq(string s, Grafo *g){
+     int n=0,m=0;
+     fstream arq(s);
+    Json::Value raiz;
+
+    arq >> raiz;
+    
+    cout << raiz["nome"];
+    n << raiz['vertices'].size(); 
+    m << raiz['arestas'].size();
+    
+    g->criaGrafo(n,m,NULL);
+
+    
+    
+    arq.close();
+}
 
 int main() {
     Grafo *g1 = new Grafo(grafoMatriz);// grafo do tipo matriz
     Grafo *g2 = new Grafo(grafoLista);// grafo do tipo lista
-    int n=0, v1=0,v2=0; // numero de vertices . Vértice 1 e vértice 2 da aresta
-    fstream arq("dados/grafoN5.json");
-    Json::Value raiz;
+    int v1=0,v2=0; // numero de vertices . Vértice 1 e vértice 2 da aresta
+  
+    //abre arquivo JSON e joga no objeto grafo
+    abreArq("dados/grafoN5.json",  g1);
     
-    arq >> raiz;
-    cout << raiz["nome"];
-    
-     cout << *g1 ;
-    
+    //imprime o grafo
+    cout << *g1 ;
+   
     
 //    cout << "digite o numero de vértices " << endl ;
 //    cin >> n;
