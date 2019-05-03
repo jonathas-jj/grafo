@@ -43,6 +43,9 @@
           <stripSymbols>true</stripSymbols>
           <standard>8</standard>
         </ccTool>
+        <asmTool>
+          <commandLine>-ljsoncpp</commandLine>
+        </asmTool>
         <linkerTool>
           <additionalDep>-ljsoncpp</additionalDep>
           <commandLine>-ljsoncpp</commandLine>

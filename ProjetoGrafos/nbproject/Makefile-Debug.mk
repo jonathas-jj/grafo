@@ -50,7 +50,7 @@ CXXFLAGS=
 FFLAGS=
 
 # Assembler Flags
-ASFLAGS=
+ASFLAGS=-ljsoncpp
 
 # Link Libraries and Options
 LDLIBSOPTIONS=

@@ -33,8 +33,7 @@ int main() {
     arq >> raiz;
     cout << raiz["nome"];
     
-    
-    
+     cout << *g1 ;
     
     
 //    cout << "digite o numero de vértices " << endl ;
@@ -49,7 +48,7 @@ int main() {
 //                
 //        cin >> v1 ;
 //    }
-      cout << *g1 ;
+     
     
     return 0;
 }   
