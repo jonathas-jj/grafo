@@ -16,6 +16,7 @@
 #include<vector>
 #include <iostream>
 #include <iterator>
+#include <jsoncpp/json/value.h>
 
 #define grafoMatriz 1
 #define grafoLista  2
@@ -88,10 +89,10 @@ int Grafo::insereVertice(){
 }
 
 
-
+//cria grafo a partir de uma matriz de arestas
 // verifica o tipo de grafo , aloca a matriz e depois prenche a matriz com as arestas passadas por 
 // parametro(um array n x 2, onde os vertices estão aos pares indicando ligação).
-void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas){
+void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas ){
     
     this->nVertices = nVertices;
     this->mArestas = mArestas;
@@ -103,13 +104,14 @@ void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas){
         }
          //preenhe matriz cm arestas.
         for (int i = 0; i < mArestas; i++){
-            int verticeA = arestas[i][0], verticeB = arestas[i][1];
+            int verticeA = arestas[i][0]-1, verticeB = arestas[i][1]-1;
             //preenche apenas a parte de cima da matriz
             if(verticeA <= verticeB){ 
                 this->matriz[verticeA][verticeB] = 1 ;
             }else{
                 this->matriz[verticeB][verticeA] = 1 ;
             }
+            
         }
         
     }else if (tipoGrafo == grafoLista){
@@ -119,14 +121,32 @@ void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas){
         //conectados a eles.
         //preenhe matriz cm arestas.
         for(int i = 0; i < mArestas; i++ ){
-             int verticeA = arestas[i][0], verticeB = arestas[i][1];
+            int verticeA = arestas[i][0]-1, verticeB = arestas[i][1]-1;
             this->listaAdj[verticeA].push_back(verticeB) ;
             this->listaAdj[verticeB].push_back(verticeA) ;
+            
         }
     }
     
 }
 
+
+//cria grafo a partir de um arquivo JSON.
+void Grafo::criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz){
+    int *arestas[mArestas];
+    
+    for(int i=0;i< mArestas;i++){
+        arestas[i] = new int[2];
+        arestas[i][0] =stoi(raiz["arestas"][i][0].asString());
+        arestas[i][1] =stoi(raiz["arestas"][i][1].asString());
+    }
+    criaGrafo(nVertices,mArestas,arestas);
+    
+    for(int i=0;i< mArestas;i++){
+      delete arestas[i];  
+    }
+        
+}
 vector<int> Grafo::buscaEmLargura(){
     vector<int> saida;
     visitados[0]=1;
@@ -144,20 +164,20 @@ vector<int> Grafo::BuscaEmProfundidade(){
 string Grafo::imprimeGrafo(){
     string s(" ");
     
-    s= s + "Arestas: /n"; 
+    s= s + "\nArestas: \n"; 
     if (this->tipoGrafo == grafoMatriz){
         for(int i = 0 ; i < this->nVertices ;i++){
             for(int j = 0 ; j < this->nVertices ;j++){
                 if(i==j)continue;
                 if(this->matriz[i][j] == 1)
-                 s += " (" +to_string(i) + " ," + to_string(j) + ") /n"; //consertar
+                 s += " (" +to_string(i+1) + " ," + to_string(j+1) + ") \n"; //consertar
             }
         }
     }else if(this->tipoGrafo == grafoLista){
         
         for(int i = 0 ; i < this->nVertices; i++){
            for(list<int>::iterator it = this->listaAdj->begin(); it != this->listaAdj[i].end(); it++ ){
-               s += " ("  + to_string(i)  + ", " + to_string(*it) + ") /n";
+               s += " ("  + to_string(i)  + ", " + to_string(*it) + ") \n";
            } 
         }
     }

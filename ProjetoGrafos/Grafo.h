@@ -19,6 +19,7 @@
 #define grafoMatriz 1
 #define grafoLista  2
 #include <iostream>
+#include <jsoncpp/json/json.h>
 using namespace std;
 
 class Grafo {
@@ -31,6 +32,7 @@ public:
     int insereVertice();//feito
     string imprimeGrafo();//feito
     void criaGrafo(int vertices, int mAresta, int ** arestas);//feito
+    void criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz);
     vector<int> buscaEmLargura();
     vector<int> BuscaEmProfundidade();
     friend ostream& operator<<(ostream& strm,  Grafo& g);

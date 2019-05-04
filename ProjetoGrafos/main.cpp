@@ -24,18 +24,16 @@ using namespace std;
  */
 void abreArq(string s, Grafo *g){
      int n=0,m=0;
-     fstream arq(s);
-    Json::Value raiz;
+    fstream arq(s);
+    Json::Value JSONRaiz;
 
-    arq >> raiz;
-    
-    cout << raiz["nome"];
-    n << raiz['vertices'].size(); 
-    m << raiz['arestas'].size();
-    
-    g->criaGrafo(n,m,NULL);
-
-    
+    arq >> JSONRaiz;
+    cout << JSONRaiz["nome"];
+    n = JSONRaiz["vertices"].size(); 
+    m = JSONRaiz["arestas"].size();
+    cout<<m;
+ 
+    g->criaGrafoJSON(n,m,JSONRaiz);
     
     arq.close();
 }
