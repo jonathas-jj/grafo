@@ -2,7 +2,7 @@
 classes c++ para construção e manipulação de grafos
 * Dependências 
   * JsonCPP : [jsoncpp  - mais informações](https://github.com/open-source-parsers/jsoncpp)
-  * Para instalar biblioteca jsoncpp mo linux : sudo apt-get install libjsoncpp-dev
+  * Para instalar biblioteca jsoncpp no linux : sudo apt-get install libjsoncpp-dev
   * Para compilar g++ *.cpp -std=c++11 -ljsoncpp
   
 * Ferramentas 
@@ -16,7 +16,7 @@ classes c++ para construção e manipulação de grafos
   *GrafoCreator.h 
   
 * Pasta dos grafos (precisam estar no mesmo diretório do executável)
- * dados/
+  * dados/
 
 *Arquivos principais também em https://drive.google.com/open?id=1yv5LYIKTX4ZvBuq7GtQOxAUb5Qn6NZVI
   
