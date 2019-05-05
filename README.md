@@ -21,4 +21,4 @@ classes c++ para construção e manipulação de grafos
 *Arquivos principais também em https://drive.google.com/open?id=1yv5LYIKTX4ZvBuq7GtQOxAUb5Qn6NZVI
   
 ### UERJ - Ciência da computação.
-**Autor(es): Jonathas Quarteroli**
+**Autor(es): Jonathas Quarteroli, Luiz Granjeiro e Herick Gomes Leal.**
