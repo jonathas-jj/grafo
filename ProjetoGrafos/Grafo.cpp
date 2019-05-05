@@ -64,7 +64,9 @@ void Grafo::insereAresta(int a, int b){
 }
 // realoca a matriz usando uma auxiliar e depois  
 int Grafo::insereVertice(){
+    cout << nVertices;
     this->nVertices++;
+    cout << nVertices;
     if(tipoGrafo == grafoMatriz ){
         int ** matrizAux = new int *[this->nVertices];
             for(int i = 0; i < this->nVertices; i++){
@@ -81,10 +83,11 @@ int Grafo::insereVertice(){
     }
     else if(tipoGrafo == grafoLista){
         list<int> *listAux = new list<int>[this->nVertices];
-        for(int i = 0; i < nVertices-1; i++){
+        for(int i = 0; i < this->nVertices-1; i++){
             listAux[i] = this->listaAdj[i];
+
         }
-        delete this->listaAdj; // obs !!!!!!!!!!!!!!!!!1
+        
         this->listaAdj = listAux;
         
     }
@@ -189,7 +192,7 @@ string Grafo::imprimeGrafo(){
         s= s + "\nArestas: \n"; 
         for(int i = 0 ; i < this->nVertices; i++){
            for(list<int>::iterator it = this->listaAdj[i].begin(); it != this->listaAdj[i].end(); it++ ){
-               
+               if( *it==-1 )continue;
                s += " ("  + to_string(i+1)  + ", " + to_string((*it)+1) + "), ";
            } 
         }

@@ -106,7 +106,7 @@ int main() {
             cout<< "\nDeseja add um vertice?(s para sim ou qualquer tec para ñ) ";
             cin >> add;
             if(add == 's'){
-                g->insereVertice();
+                
                 cout<< "\n Vertice" + to_string(g->insereVertice()) +" incluido!! ";
             } 
             
