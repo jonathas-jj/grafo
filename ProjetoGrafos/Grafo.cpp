@@ -17,6 +17,7 @@
 #include <iostream>
 #include <iterator>
 #include <jsoncpp/json/value.h>
+#include <algorithm>
 
 #define grafoMatriz 1
 #define grafoLista  2
@@ -48,6 +49,7 @@ Grafo::~Grafo() {
 }
 
 void Grafo::insereAresta(int a, int b){
+    a--;b--;
      if(tipoGrafo == grafoMatriz ){
          //preenche apenas a parte de cima da matriz
             if(a <= b){ 
@@ -86,6 +88,7 @@ int Grafo::insereVertice(){
         this->listaAdj = listAux;
         
     }
+    return this->nVertices;
 }
 
 
@@ -115,6 +118,7 @@ void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas ){
         }
         
     }else if (tipoGrafo == grafoLista){
+       
         this->listaAdj = new list<int>[this->nVertices];
         
         //cada indice da lista é um vertice e todos os nós da lista sao outros vertices
@@ -142,9 +146,7 @@ void Grafo::criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz){
     }
     criaGrafo(nVertices,mArestas,arestas);
     
-    for(int i=0;i< mArestas;i++){
-      delete arestas[i];  
-    }
+    
         
 }
 vector<int> Grafo::buscaEmLargura(){
@@ -163,25 +165,36 @@ vector<int> Grafo::BuscaEmProfundidade(){
 
 string Grafo::imprimeGrafo(){
     string s(" ");
+    s= s + "\n vértices: \n";
+    for(int i = 0 ; i < this->nVertices ;i++){
+        if ((this->tipoGrafo == grafoMatriz && 
+                this->matriz[i][i]==-1) || (this->tipoGrafo == grafoLista)
+                && this->listaAdj[i].front()==-1) continue;
+         s= s + " "+to_string(i+1)+", "; 
+    }
     
-    s= s + "\nArestas: \n"; 
     if (this->tipoGrafo == grafoMatriz){
+        s= s + "\nArestas: \n"; 
         for(int i = 0 ; i < this->nVertices ;i++){
+            //pula vertices excluidos
+               if(matriz[i][i]==-1 )continue;
             for(int j = 0 ; j < this->nVertices ;j++){
-                if(i==j)continue;
+                //pula vertices iguais e excluidos
+                if(i==j || matriz[j][j]==-1 )continue;
                 if(this->matriz[i][j] == 1)
-                 s += " (" +to_string(i+1) + " ," + to_string(j+1) + ") \n"; //consertar
+                 s += " (" +to_string(i+1) + " ," + to_string(j+1) + "), "; //consertar
             }
         }
     }else if(this->tipoGrafo == grafoLista){
-        
+        s= s + "\nArestas: \n"; 
         for(int i = 0 ; i < this->nVertices; i++){
-           for(list<int>::iterator it = this->listaAdj->begin(); it != this->listaAdj[i].end(); it++ ){
-               s += " ("  + to_string(i)  + ", " + to_string(*it) + ") \n";
+           for(list<int>::iterator it = this->listaAdj[i].begin(); it != this->listaAdj[i].end(); it++ ){
+               
+               s += " ("  + to_string(i+1)  + ", " + to_string((*it)+1) + "), ";
            } 
         }
     }
-    return s;
+    return s+"\n";
 }
 
 
@@ -190,6 +203,65 @@ ostream& operator<<(ostream& strm,  Grafo &g) {
     return strm ;
 }
 
-void Grafo::vertVizinhos(){
+vector<int> Grafo::vertVizinhos(int v){
+    vector<int> vizinhos(nVertices);
+    int indice = v -1;
+    int count = 0;
     
+    if (this->tipoGrafo == grafoMatriz && this->matriz[indice][indice]==-1) 
+        return vector<int>();
+    
+    if(tipoGrafo == grafoMatriz ){
+        for(int i = 0; i < this->nVertices; i++){
+            
+            if(this->matriz[indice][i] == 1 || this->matriz[i][indice] == 1){
+                vizinhos[count]=i+1;
+                count++;
+            }
+           
+           
+        } 
+    }
+   
+    else {
+        for (list<int>::iterator i = this->listaAdj[indice].begin(); i != this->listaAdj[indice].end(); ++i){
+            vizinhos[count] = *i;
+            count++;
+        }
+    }
+    //flag pra parar um loop 
+    vizinhos[count]=-1;
+    return vizinhos;
+
 }
+ void  Grafo::RemoveAresta(int v1, int v2 ){
+     v1--;v2--;
+     if(tipoGrafo == grafoMatriz ){
+        this->matriz[v1][v2]=0;  
+        this->matriz[v2][v1]=0; 
+        
+    }else if(tipoGrafo == grafoLista){
+          this->listaAdj[v1].remove(v2);
+          this->listaAdj[v2].remove(v1);        
+    }
+    this->mArestas--;
+ }
+ void  Grafo::RemoveVertice(int v){
+    v--;
+    if(tipoGrafo == grafoMatriz ){
+       this->matriz[v][v]=-1;  
+       
+          
+            
+    }else if(tipoGrafo == grafoLista){ 
+       while ( !this->listaAdj[v].empty()){
+           this->listaAdj[v].pop_back();
+        }
+        
+        for(int i = 0; i < this->nVertices-1; i++){
+            this->listaAdj[i].remove(v);
+        }
+       this->listaAdj[v].push_back(-1);
+    }
+     
+ }

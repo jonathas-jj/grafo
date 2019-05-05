@@ -1,6 +1,10 @@
 {
-    "nome": "Grafo_Matriz_jonathas_n5",
-    "vertices":["1","2","3","4","5"],
-    "arestas":[["1","2"],["2","3"],["5","4"]]
-    
+   "arestas" : [
+      [ 5, 2 ],
+      [ 4, 1 ],
+      [ 4, 2 ],
+      [ 4, 3 ]
+   ],
+   "nome" : "grafoN5",
+   "vertices" : [ 1, 2, 3, 4, 5 ]
 }

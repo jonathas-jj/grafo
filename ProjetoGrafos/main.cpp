@@ -15,7 +15,9 @@
 #include <string>
 #include <jsoncpp/json/json.h> //biblioteca de manipulação de arquivos json
 #include "Grafo.h"
+#include "GrafoCreator.h"
 #include <fstream>  
+#include <sstream>
 
 using namespace std;
 
@@ -31,37 +33,126 @@ void abreArq(string s, Grafo *g){
     cout << JSONRaiz["nome"];
     n = JSONRaiz["vertices"].size(); 
     m = JSONRaiz["arestas"].size();
-    cout<<m;
- 
-    g->criaGrafoJSON(n,m,JSONRaiz);
     
+    g->criaGrafoJSON(n,m,JSONRaiz);
+   
     arq.close();
 }
+   
 
 int main() {
-    Grafo *g1 = new Grafo(grafoMatriz);// grafo do tipo matriz
-    Grafo *g2 = new Grafo(grafoLista);// grafo do tipo lista
-    int v1=0,v2=0; // numero de vertices . Vértice 1 e vértice 2 da aresta
-  
-    //abre arquivo JSON e joga no objeto grafo
-    abreArq("dados/grafoN5.json",  g1);
+    Grafo *g;// grafo do tipo matriz
+    // grafo do tipo lista
+    int nDoGrafo,tipoGrafo,opcao = 1;
     
-    //imprime o grafo
-    cout << *g1 ;
-   
+    //cria arquivos JSON caso n existam.
+    criarGrafos();
+    cout << "\nDigite o grafo que deseja ler:"
+            "n=5, n=6, n=7, n=8, n=9, n=10,  n=20,"
+            " n=50, n=100, n=200, n=500, n=1000 \n"
+            " " << endl;
+    cin>>nDoGrafo;
+    cout << "\nDigite o tipo de grafo(matriz = 1, lista = 2):" ;
+    cin>>tipoGrafo;
     
-//    cout << "digite o numero de vértices " << endl ;
-//    cin >> n;
-//    g1->criaGrafo(n,0,NULL); // cria grafo com 0 arestas
-//    cout << "digite as arestas separadas por espaços.Quando acabar, ou se não houver aresta, digite -1 ." << endl ;
-//    cin >> v1 ;
-//    while(v1!=-1){
-//        cin >> v2;
-//
-//        g1->insereAresta(v1,v2);
-//                
-//        cin >> v1 ;
-//    }
+    g = new Grafo(tipoGrafo);
+    abreArq("dados/grafoN"+to_string(nDoGrafo)+".json",  g);
+    
+     //imprime o grafo
+    cout << *g ;
+    while(opcao!=0){
+        
+        int vertViz,vertice,verticeA,verticeB;
+        string s;
+        
+        char add;
+        
+                
+       
+        
+        cout <<"\n\nDigite 0 para sair"<<endl;                   
+        cout <<"Digite 1 para mostras vértices vizinhos"<<endl;                   
+        cout <<"Digite 2 para remover vértice"<<endl;                   
+        cout <<"Digite 3 para adicionar vértice"<<endl;                   
+        cout <<"Digite 4 para remover aresta"<<endl;
+        cout <<"Digite 5 para adicionar aresta"<<endl;
+        cout <<"Digite 6 para imprimir grafo"<<endl;
+        cout <<"Digite 7 para ler outro arquivo json"<<endl;
+        cin >> opcao;
+       
+        
+        
+        if(opcao==1){
+            cout << "\nDigite o vértice que deja saber os vizinhos.";
+            cin>>vertViz;
+            cout<< "vizinhos: ";
+            for(int i=0;; i++){        
+                vector<int> vizinhos(g->vertVizinhos(vertViz));
+
+                if( vizinhos.size() == 0 || vizinhos[i]==-1 )break; //flag colocada para parada do loop
+                cout<<vizinhos[i]<<" ";
+
+            }
+            
+        }else if(opcao==2){
+            cout<< "\nDigite um vertice para excluir:(-1 pra não excluir) ";
+            cin >> vertice;
+            if(vertice!=-1){
+                g->RemoveVertice(vertice);
+                cout<< "\n Vertice "<< to_string(vertice)<< " para excluido!! ";
+            }
+            
+        }else if(opcao==3){
+            cout<< "\nDeseja add um vertice?(s para sim ou qualquer tec para ñ) ";
+            cin >> add;
+            if(add == 's'){
+                g->insereVertice();
+                cout<< "\n Vertice" + to_string(g->insereVertice()) +" incluido!! ";
+            } 
+            
+        }else if(opcao==4){
+            
+            cout<< "\nDeseja excluir uma aresta?(digite os 2 vertices(v1 v2) ou -1 para pular) "<<endl;
+            
+            cin >> verticeA;
+            
+            if(verticeA != -1){
+                cin >> verticeB;
+                g->RemoveAresta(verticeA,verticeB);
+                cout<< "\n aresta: (";cout << verticeA;cout << ", "; cout<<verticeB; cout<< ") removida!! ";
+            } 
+            
+        }else if(opcao==5){
+            cout<< "\nDeseja add uma aresta?(digite os 2 vertices(v1 v2) ou -1 para pular) ";
+            cin >> verticeA;
+
+            if(verticeA != -1){
+                cin >> verticeB;
+                g->insereAresta(verticeA,verticeB);
+                cout<< "\n aresta: (";cout << verticeA;cout << ", "; cout<<verticeB; cout<< ") incluida!! ";
+            } 
+            
+        }else if(opcao==6){ 
+           cout << *g ;
+           
+        }else if(opcao==7){
+                    
+            cout << "\nDigite o grafo que deseja ler:"
+            "n=5, n=6, n=7, n=8, n=9, n=10,  n=20,"
+            " n=50, n=100, n=200, n=500, n=1000 \n"
+             << endl;
+        
+            cin>>nDoGrafo;
+            cout << "\nDigite o tipo de grafo(matriz = 1, lista = 2):" ;
+            cin>>tipoGrafo;
+            delete g;
+            g = new Grafo(tipoGrafo);
+            //abre arquivo JSON e joga no objeto grafo com o tipo desejado
+            abreArq("dados/grafoN"+to_string(nDoGrafo)+".json",  g);
+            //imprime o grafo
+            cout << *g ;
+        }
+    }
      
     
     return 0;

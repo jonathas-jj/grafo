@@ -36,7 +36,10 @@ public:
     vector<int> buscaEmLargura();
     vector<int> BuscaEmProfundidade();
     friend ostream& operator<<(ostream& strm,  Grafo& g);
-    void vertVizinhos();
+    vector<int> vertVizinhos(int v);
+    void  RemoveAresta(int v1, int v2);
+    void  RemoveVertice(int v);
+
     
     int tipoGrafo;
  
