@@ -18,6 +18,8 @@
 #include <iterator>
 #include <jsoncpp/json/value.h>
 #include <algorithm>
+#include <stack>
+#include <queue>
 
 #define grafoMatriz 1
 #define grafoLista  2
@@ -152,6 +154,77 @@ void Grafo::criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz){
     
         
 }
+
+void Grafo::bfs(int v){
+    queur<int> fila;
+    bool visitados[v];
+
+    for(int i = 0; i < v; i++)
+        visitados[i] = false;
+
+    cout << "Visitando vertice " << v << "...\n";
+    visitados[v] = true;
+
+    while(true){
+        list<int>::iterator it;
+
+        for (it = adj[v].begin(); it != adj[v].end(); it++)
+        {
+            if(!visitados[*it]){
+                cout << "Visitando vertice " << *it << "...\n";
+                visitados[*it] = true;
+                fila.push(*it);
+            }
+        }
+
+        if(!fila.empty){
+            v = fila.fron();
+            fila.pop();
+        } else {
+            break;
+        }
+    }
+}
+
+void Grafo::dfs(int v){
+    stack<int> pilha;
+    bool visitados[v];
+
+    for(int i = 0; i < v; i++)
+        visitados[i] = false;
+    
+    while(true){
+        if(!visitados[v]){
+            cout << "Visitando vertice " << v << "...\n";
+            visitados[v] = true;
+            pilha.push(v);
+        }
+
+        bool achou = false;
+        list<int>::iterator it;
+
+        for (it = adj[v].begin(); it != adj[v].end(); it++)
+        {
+            if(!visitados[*it]){
+                achou = true;
+                break;
+            }
+        }
+
+        if(achou)
+            v = * it;
+        else {
+            pilha.pop();
+
+            if(pilha.empty())
+                break;
+
+            v = pilha.top();
+        }
+        
+    }
+}
+
 vector<int> Grafo::buscaEmLargura(){
     vector<int> saida;
     visitados[0]=1;
