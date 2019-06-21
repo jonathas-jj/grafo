@@ -155,39 +155,72 @@ void Grafo::criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz){
         
 }
 
-void Grafo::bfs(int v){
-    queur<int> fila;
+
+void Grafo::buscaEmLargura(){
+    //cria fila para enfileiras os vértices filhos.
+    //Cria um array para listar os vértices visitados    
+    queue<int> fila;
+    int v= this->nVertices;
     bool visitados[v];
 
-    for(int i = 0; i < v; i++)
-        visitados[i] = false;
+        for(int i = 0; i < v; i++)
+            visitados[i] = false;
+        //marca o vertice v como visitado
+        cout << "Visitando vertice " << v << "\n";
+        visitados[v] = true;
+    
+    if (tipoGrafo == grafoLista){
+        while(true){
+            
+            
+            list<int>::iterator it;
+            //visita todos os filhos de v
+            for (it = this->listaAdj[v].begin(); it != listaAdj[v].end(); it++)
+            {
+                if(!visitados[*it]){
+                    cout << "Visitando vertice " << *it << "\n";
+                    visitados[*it] = true;
+                    //coloca os filhos de v na fila para serem explorados
+                    fila.push(*it);
+                }
+            }
 
-    cout << "Visitando vertice " << v << "...\n";
-    visitados[v] = true;
-
-    while(true){
-        list<int>::iterator it;
-
-        for (it = adj[v].begin(); it != adj[v].end(); it++)
-        {
-            if(!visitados[*it]){
-                cout << "Visitando vertice " << *it << "...\n";
-                visitados[*it] = true;
-                fila.push(*it);
+            if(!fila.empty()){
+                //passa a explorar os filhos de determinado vertice q foi enfileirado antes
+                v = fila.front();
+                fila.pop();
+            } else {
+                //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
+                break;
             }
         }
+    }else if(tipoGrafo == grafoMatriz){
+        while(true){
+            for(int j =0;j< this->nVertices;j++ ){
+                 //visita todos os filhos de v
+                if(this->matriz[v][j]==1){
+                    cout << "Visitando vertice " << j << "\n";
+                    fila.push(this->matriz[v][j]);
+                    visitados[j] = true;
+                }
 
-        if(!fila.empty){
-            v = fila.fron();
-            fila.pop();
-        } else {
-            break;
+            }
+            if(!fila.empty()){
+                //passa a explorar os filhos de determinado vertice q foi enfileirado antes
+                v = fila.front();
+                fila.pop();
+            } else {
+                //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
+                break;
+            }
         }
     }
+    
 }
 
-void Grafo::dfs(int v){
+vector<int> Grafo::BuscaEmProfundidade(){
     stack<int> pilha;
+    int v = this->nVertices;
     bool visitados[v];
 
     for(int i = 0; i < v; i++)
@@ -203,7 +236,7 @@ void Grafo::dfs(int v){
         bool achou = false;
         list<int>::iterator it;
 
-        for (it = adj[v].begin(); it != adj[v].end(); it++)
+        for (it = this->listaAdj[v].begin(); it != this->listaAdj[v].end(); it++)
         {
             if(!visitados[*it]){
                 achou = true;
@@ -223,20 +256,6 @@ void Grafo::dfs(int v){
         }
         
     }
-}
-
-vector<int> Grafo::buscaEmLargura(){
-    vector<int> saida;
-    visitados[0]=1;
-    saida[0]=1;
-//    this->filaDeBusca();
-    
-    
-    return saida;
-}
-
-vector<int> Grafo::BuscaEmProfundidade(){
-    
 }
 
 string Grafo::imprimeGrafo(){

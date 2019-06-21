@@ -27,20 +27,23 @@ public:
     
     Grafo(int tipoDeGrafo); //feito
     Grafo(const Grafo& orig);
-    virtual ~Grafo();//feito
-    void  insereAresta(int a, int b);//feito
-    int insereVertice();//feito
-    string imprimeGrafo();//feito
-    void criaGrafo(int vertices, int mAresta, int ** arestas);//feito
-    void criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz);
-    vector<int> buscaEmLargura();
-    vector<int> BuscaEmProfundidade();
-    friend ostream& operator<<(ostream& strm,  Grafo& g);
-    vector<int> vertVizinhos(int v);
-    void  RemoveAresta(int v1, int v2);
-    void  RemoveVertice(int v);
-
+    virtual     ~Grafo();//feito
+    void        insereAresta(int a, int b);//feito
+    int         insereVertice();//feito
+    string      imprimeGrafo();//feito
+    void        criaGrafo(int vertices, int mAresta, int ** arestas);//feito
+    void        criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz);
     
+//algoritmos de busca    
+    void        buscaEmLargura();
+    vector<int> BuscaEmProfundidade();
+    vector<int> vertVizinhos(int v);
+    void        RemoveAresta(int v1, int v2);
+    void        RemoveVertice(int v);
+
+
+
+   friend ostream& operator<<(ostream& strm,  Grafo& g); 
     int tipoGrafo;
  
 private:
