@@ -22,26 +22,37 @@
 #include <jsoncpp/json/json.h>
 using namespace std;
 
+
 class Grafo {
 public:
     
     Grafo(int tipoDeGrafo); //feito
     Grafo(const Grafo& orig);
     virtual     ~Grafo();//feito
-    void        insereAresta(int a, int b);//feito
-    int         insereVertice();//feito
-    string      imprimeGrafo();//feito
+   
+    
     void        criaGrafo(int vertices, int mAresta, int ** arestas);//feito
     void        criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz);
     
-//algoritmos de busca    
-    void        buscaEmLargura();
-    vector<int> BuscaEmProfundidade();
+    //Info do grafo
+    string      imprimeGrafo();//feito
     vector<int> vertVizinhos(int v);
+    
+    //manipulacao do grafo    
     void        RemoveAresta(int v1, int v2);
     void        RemoveVertice(int v);
-
-
+    void        insereAresta(int a, int b);//feito
+    int         insereVertice();//feito
+//algoritmos de busca    
+    void        buscaEmLargura(int raiz);
+    void        BuscaEmProfundidade(int raiz);
+    bool *      busca(int raiz);
+    void        buscaCompleta(int r);
+    bool        conectividade();
+    bool        temCiclo();
+    bool        isFloresta();
+    bool        isArvore();
+    Grafo*       ObterFlorestaGeradora();    
 
    friend ostream& operator<<(ostream& strm,  Grafo& g); 
     int tipoGrafo;
@@ -54,9 +65,10 @@ private:
     //lista de adjacencia
     stack<int>pilhaDeBusca;
     queue<int>filaDeBusca;
-    vector<int>visitados; //vertices visitados
-    int **exploreadas;//arestas exploradas
-    int **descobertas;//arestas descobertas    
+    vector<bool>* visitados; //vertices visitados
+    list<int *> arestasExploradas ;//arestas exploradas
+    list<int *> arestasDescobertas; //arestas descobertas
+       
     
     
 };

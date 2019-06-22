@@ -78,6 +78,7 @@ int main() {
         cout <<"Digite 5 para adicionar aresta"<<endl;
         cout <<"Digite 6 para imprimir grafo"<<endl;
         cout <<"Digite 7 para ler outro arquivo json"<<endl;
+        cout <<"Digite 8 para executar a busca no grafo."<<endl;
         cin >> opcao;
        
         
@@ -151,9 +152,20 @@ int main() {
             abreArq("dados/grafoN"+to_string(nDoGrafo)+".json",  g);
             //imprime o grafo
             cout << *g ;
+        }else if(opcao==8){
+              //buscaGrafos();      
+            
+        
+        }else if(opcao==9){
+                   
+            
         }
     }
      
     
     return 0;
-}   
+}
+
+int buscaGrafos(){
+ 
+}
