@@ -52,9 +52,12 @@ public:
     bool        temCiclo();
     bool        isFloresta();
     bool        isArvore();
-    Grafo*       ObterFlorestaGeradora();    
-
-   friend ostream& operator<<(ostream& strm,  Grafo& g); 
+    Grafo*      ObterFlorestaGeradora();    
+    void        BuscaEmProfundidadeRec(int raiz,bool flag=true);
+    void        BuscaEmLarguraRec(int raiz,bool flag);
+    vector<int> determinarDistancias(int raiz);
+    
+    friend ostream& operator<<(ostream& strm,  Grafo& g); 
     int tipoGrafo;
  
 private:
