@@ -4,14 +4,26 @@
         <activeConfTypeElem>1</activeConfTypeElem>
         <activeConfIndexElem>0</activeConfIndexElem>
     </data>
-    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="2">
+        <file>
+            <url>Grafo.cpp</url>
+            <bookmark id="2">
+                <name/>
+                <line>70</line>
+                <key/>
+            </bookmark>
+            <bookmark id="1">
+                <name/>
+                <line>675</line>
+                <key/>
+            </bookmark>
+        </file>
+    </editor-bookmarks>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/jofra/NetBeansProjects/grafo/ProjetoGrafos/GrafoCreator.h</file>
             <file>file:/home/jofra/NetBeansProjects/grafo/ProjetoGrafos/GrafoCreator.cpp</file>
             <file>file:/home/jofra/NetBeansProjects/grafo/ProjetoGrafos/main.cpp</file>
             <file>file:/home/jofra/NetBeansProjects/grafo/ProjetoGrafos/Grafo.h</file>
-            <file>file:/home/jofra/NetBeansProjects/grafo/ProjetoGrafos/dados/grafoN20.json</file>
             <file>file:/home/jofra/NetBeansProjects/grafo/ProjetoGrafos/Grafo.cpp</file>
         </group>
     </open-files>

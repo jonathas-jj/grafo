@@ -29,10 +29,18 @@ using namespace std;
 
 Grafo::Grafo(int tipoDeGrafo) {
     this->tipoGrafo = tipoDeGrafo;
+    this->nVertices = 0;
+    this->mArestas = 0;
+    this->matriz = NULL;
+    this->listaAdj = NULL;
 }
 
 Grafo::Grafo(const Grafo& orig) {
-    
+   
+    this->nVertices = 0;
+    this->mArestas = 0;
+    this->matriz = NULL;
+    this->listaAdj = NULL;
 }
 // limpa a memória
 Grafo::~Grafo() {
@@ -43,11 +51,13 @@ Grafo::~Grafo() {
         delete[] this->matriz;
     }
     if(this->tipoGrafo == grafoLista ){
-        for (int i = 0; i < nVertices; i++){
-           delete[] this->matriz[i];
-        }
-        delete[] this->matriz;
+        
+           delete[]  this->listaAdj;
+        
+        
     }
+    delete[] this->visitados; //vertices visitados
+    
 }
 
 void Grafo::insereAresta(int a, int b){
@@ -66,21 +76,24 @@ void Grafo::insereAresta(int a, int b){
 }
 // realoca a matriz usando uma auxiliar e depois  
 int Grafo::insereVertice(){
-    cout << nVertices;
+    
     this->nVertices++;
-    cout << nVertices;
+    
     if(tipoGrafo == grafoMatriz ){
         int ** matrizAux = new int *[this->nVertices];
             for(int i = 0; i < this->nVertices; i++){
                 matrizAux[i] = new int[this->nVertices];
             }
-        for(int i = 0; i < this->nVertices-1; i++){
-           for(int j = 0; j < this->nVertices-1; j++){
-               matrizAux[i][j] = this->matriz[i][j];  
+        if(this->matriz){
+            for(int i = 0; i < this->nVertices-1; i++){
+               for(int j = 0; j < this->nVertices-1; j++){
+                   matrizAux[i][j] = this->matriz[i][j];  
+                }
+               delete[] matriz[i] ;
             }
-           delete[] matriz[i] ;
-        }
-      delete[] this->matriz;  
+          delete[] this->matriz;  
+        }  
+      
       this->matriz = matrizAux;
     }
     else if(tipoGrafo == grafoLista){
@@ -165,38 +178,50 @@ void Grafo::buscaEmLargura(int raiz){
     bool visitados[n];
     
     list<int*>::iterator it2;
-
+    
+    cout<< "-------------Busca Em Largura-------------" << endl;    
         for(int i = 0; i < n; i++)
             visitados[i] = false;
         //marca o vertice v como visitado
-        cout << "Visitando vertice " << v << "\n";
+        cout << "Visitando vertice " << v+1 << "\n";
         visitados[v] = true;
-    
+     
     if (tipoGrafo == grafoLista){
         while(true){
             
-            
+            if(this->listaAdj[v].front() == -1) {cout <<"Vertice inexitente" ;return;}
             list<int>::iterator it;
             //visita todos os filhos de v
             for (it = this->listaAdj[v].begin(); it != listaAdj[v].end(); it++)
             {
-                int* aresta = new int[2];
-                aresta[0] = v;
-                aresta[1] = *it; 
-                //se o vertice n foi visitado, visite ele e descubra a aresta
-                 if(!visitados[*it]){
-                    cout << "Visitando vertice " << *it << "\n";
-                    visitados[*it] = true;
-                    //coloca os filhos de v na fila para serem explorados
-                    fila.push(*it);
-                    this->arestasDescobertas.push_back(aresta);
-                }
+               
                 //se a aresta ainda n foi explorada, explore-a
-                it2 = find (this->arestasExploradas.begin(), this->arestasExploradas.end(), aresta); 
-                if(it2!=this->arestasExploradas.end()){  
-                    this->arestasExploradas.push_back(aresta);
-                    cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
-                }          
+                //verifica se a aresta já foi explorada
+                    it2 = arestasExploradas.begin();
+                    while(it2!=arestasExploradas.end()){
+                       if ( ( (*it2)[0] == v && (*it2)[1] == *it) ||  
+                           ( (*it2)[0] == *it) && (*it2)[1] == v)  break; 
+                       it2++; 
+                    }
+                    
+                    if(it2==arestasExploradas.end()){
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = *it;    
+                        arestasExploradas.push_back(aresta);
+                        cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                          
+                       
+                    
+                        if(!visitados[*it]){
+                            cout << "Visitando vertice " << *it+1 << "\n";
+                            visitados[*it] = true;
+                            //coloca os filhos de v na fila para serem explorados
+                            fila.push(*it);
+                            arestasDescobertas.push_back(aresta);
+                            cout << "aresta de descoberta: ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                         }
+                    }           
                 
                
                 
@@ -213,32 +238,40 @@ void Grafo::buscaEmLargura(int raiz){
         }
     }else if(tipoGrafo == grafoMatriz){
         while(true){
-            for(int j =0;j< this->nVertices;j++ ){
-                
-                
-                //se houver aresta
-                if(this->matriz[v][j]==1){
+            if(this->matriz[v][v] == -1) {cout <<"Vertice inexitente" ;return;}
+            for(int j =0;j< this->nVertices;j++ ){                
+                if(this->matriz[j][j] == -1) continue;
+                //verifica se há aresta ( como a tabela matriz está preenchida soh na parte de cima
+                // foi preciso verificar onde está marcado a aresta)
+                if(( v < j && this->matriz[v][j]==1) || ( j < v && this->matriz[j][v]==1)){
                     
                     //explora a aresta
-                    int* aresta = new int[2];
-                    aresta[0] = v;
-                    aresta[1] = j;    
-                    arestasExploradas.push_back(aresta);
-                    cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] <<")\n";
-                       
                     
-                    if(!visitados[j]){
-                        cout << "Visitando vertice " << j << "\n";
-                        visitados[j] = true;
-                        //coloca os filhos de v na fila para serem explorados
-                        fila.push(j);
-                        arestasDescobertas.push_back(aresta);
-                     }
                     
-                    it2 = find (arestasExploradas.begin(), arestasExploradas.end(), aresta); 
-                    if(it2!=arestasExploradas.end()){  
+                    //verifica se a aresta já foi explorada
+                    it2 = arestasExploradas.begin();
+                    while(it2!=arestasExploradas.end()){
+                       if ( ( (*it2)[0] == v && (*it2)[1] == j) ||  
+                           ( (*it2)[0] == j) && (*it2)[1] == v)  break; 
+                       it2++; 
+                    }
+                    
+                    if(it2==arestasExploradas.end()){
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = j;    
                         arestasExploradas.push_back(aresta);
-                        cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
+                        cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                                     
+                    
+                        if(!visitados[j]){
+                            cout << "Visitando vertice " << j+1 << "\n";
+                            visitados[j] = true;
+                            //coloca os filhos de v na fila para serem explorados
+                            fila.push(j);
+                            arestasDescobertas.push_back(aresta);
+                            cout << "aresta de descoberta: ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                         }
                     }  
                     
                 }
@@ -258,27 +291,32 @@ void Grafo::buscaEmLargura(int raiz){
     this->visitados = new vector<bool>(visitados,visitados+n);
 }
 
-void Grafo::BuscaEmProfundidade(int raiz){
+void Grafo::BuscaEmProfundidade(int raiz ){
     stack<int> pilha;
     int v = raiz;
     int n = this->nVertices;
     int m = this->mArestas;
     bool visitados[n];
-        
+    list<int*>::iterator it2;    
     for(int i = 0; i < n; i++)
         visitados[i] = false;
     
+    bool achou;
     
+     cout<< "-------------Busca Em Profundidade -------------"<< endl;  
     if (tipoGrafo == grafoLista){
         while(true){
+            if(this->listaAdj[v].front() == -1) {cout <<"Vertice inexitente" ;return;}
+            
             if(!visitados[v]){
-                cout << "Visitando vertice " << v << "...\n";
+                cout << "Visitando vertice " << v+1 << "...\n";
                 visitados[v] = true;
                 //empilha primeiro vértice.
                 pilha.push(v);
             }
 
-            bool achou = false;
+            achou= false;
+            
             list<int>::iterator it;
 
             for (it = this->listaAdj[v].begin(); it != this->listaAdj[v].end(); it++)
@@ -287,15 +325,32 @@ void Grafo::BuscaEmProfundidade(int raiz){
                 aresta[0] = v;
                 aresta[1] = *it;
                 
-                cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
+                //verifica se a aresta já foi explorada
+                    it2 = arestasExploradas.begin();
+                    while(it2!=arestasExploradas.end()){
+                       if ( ( (*it2)[0] == v && (*it2)[1] == *it) ||  
+                           ( (*it2)[0] == *it) && (*it2)[1] == v)  break; 
+                       it2++; 
+                    }
+                    
+                    if(it2==arestasExploradas.end()){  
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = *it;                          
+                        arestasExploradas.push_back(aresta);
+                        cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
                 
-                this->arestasExploradas.push_back(aresta);
+                        if(!visitados[*it]){           
+                            cout << "aresta de descoberta: ( " << aresta[0]+1 << "," <<aresta[1]+1 << ")\n";
+                            this->arestasDescobertas.push_back(aresta);                
+                            achou = true;
+                            break;
+                        }
+                    }    
                 
-                if(!visitados[*it]){                    
-                    this->arestasDescobertas.push_back(aresta);                
-                    achou = true;
-                    break;
-                }
+                
+                
+                
             }
 
             if(achou)
@@ -312,37 +367,52 @@ void Grafo::BuscaEmProfundidade(int raiz){
         }
     }else if(tipoGrafo == grafoMatriz){
         while(true){
+            if(this->matriz[v][v] == -1) {cout <<"Vertice inexitente" ;return;}
             if(!visitados[v]){
-                cout << "Visitando vertice " << v << "...\n";
+                cout << "Visitando vertice " << v+1 << "...\n";
                 visitados[v] = true;
                 //empilha primeiro vértice.
                 pilha.push(v);
             }
 
-            bool achou = false;
-            list<int>::iterator it;
-
-           for(int j =0;j< this->nVertices;j++ )  {
-                if(this->matriz[v][j]==1){
+            achou = false;
+           
+           int j;
+           for(j =0;j< this->nVertices;j++ )  {
+                  
+                 if(( v < j && this->matriz[v][j]==1) || ( j < v && this->matriz[j][v]==1)){
+                         
                     
-                    int* aresta = new int[2];
-                    aresta[0] = v;
-                    aresta[1] = j;
-                    
-                    cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
-                    this->arestasExploradas.push_back(aresta);
-                    
-                    if(!visitados[*it]){
-                        
-                        this->arestasDescobertas.push_back(aresta);   
-                        achou = true;
-                        break;
+                    //verifica se a aresta já foi explorada
+                    it2 = arestasExploradas.begin();
+                    while(it2!=arestasExploradas.end()){
+                       if ( ( (*it2)[0] == v && (*it2)[1] == j) ||  
+                           ( (*it2)[0] == j && (*it2)[1] == v) ) break; 
+                       it2++; 
                     }
+                    
+                    if(it2==arestasExploradas.end()){  
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = j;                          
+                        arestasExploradas.push_back(aresta);
+                        cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                        
+                        
+                        if(!visitados[j]){
+                            cout << "Aresta de descoberta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                            this->arestasDescobertas.push_back(aresta);   
+                            achou = true;
+                            break;
+                        }
+                    }
+                    
+                    
                 }
             }
 
             if(achou)
-                v = * it;
+                v = j;
             else {
                 pilha.pop();
 
@@ -354,150 +424,244 @@ void Grafo::BuscaEmProfundidade(int raiz){
 
         }
     }
-    //retorna um vetor com os vértices visitados
-    delete this->visitados;
-    this->visitados = new vector<bool>(visitados,visitados+n);
+    //deleta os vértices visitados anteriormente e adiciona novos.  
+    
+        delete this->visitados;
+        this->visitados = new vector<bool>(visitados,visitados+n);
+    
 }
 
 //flag serve pra não entrar no primeiro if 
 // que  limpa o vetor visitados.
 void Grafo::BuscaEmProfundidadeRec(int raiz,bool flag){
     int v = raiz;
-    if (flag==true){
-        delete this->visitados;
-        this->visitados = new vector<bool>(this->nVertices);
-    }
-    list<int>::iterator it;
-    for (it = this->listaAdj[v].begin(); it != this->listaAdj[v].end(); it++){
-        int* aresta = new int[2];
-        aresta[0] = v;
-        aresta[1] = *it;
-        if(!binary_search(this->visitados->begin(),this->visitados->end(),*it)){ 
-            
-            cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
-            this->arestasExploradas.push_back(aresta); 
-            (*this->visitados)[*it] = true;
-        }else{        
+    
+    if (tipoGrafo == grafoLista){
+        if(this->listaAdj[v].front() == -1) {cout <<"Vertice inexitente" ;return;}
+        if (flag==true){
+            delete this->visitados;
+            this->visitados = new vector<bool>(this->nVertices);
+            cout<< "-------------Busca Em Profundidade Recursiva-------------"<< endl;
+        }
+        cout << "Visitando vertice " << v+1 << "...\n";   
+        list<int>::iterator it;
+        for (it = this->listaAdj[v].begin(); it != this->listaAdj[v].end(); it++){
+            int* aresta = new int[2];
             aresta[0] = v;
             aresta[1] = *it;
-            this->arestasDescobertas.push_back(aresta);
-            BuscaEmProfundidadeRec(*it,false);
+            cout << "Explorando aresta ( " << aresta[0] << "," << aresta[1] << ")\n";
+                this->arestasExploradas.push_back(aresta); 
+            if((*this->visitados)[*it] == false){ 
+                (*this->visitados)[*it] = true;
+                aresta[0] = v;
+                aresta[1] = *it;
+                this->arestasDescobertas.push_back(aresta);
+                cout << "Aresta de descoberta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                   
+                BuscaEmProfundidadeRec(*it,false);
+            }
         }
-    }
-    
-}
-
-
-
-
-/*
-//AS duas buscas do slide5 num só método
-bool * Grafo::busca(int raiz)
-{
-    int countAtual;
-    int v = this->nVertices;
-    int m = this->mArestas;
-    
-     bool visitados[v];
-    
-    int arestasExploradas[m][3];
-    list<int *> arestasDescobertas;
-    
-    for(int i = 0; i < v; i++)
-        visitados[i] = false;
-
-    
-    visitados[raiz] = true;
-    
-    if(tipoGrafo == grafoLista){
-        
-        int m=0;
-        //coloca todas as arestas existentes num array
-        for(int i = 0 ; i < this->nVertices ;i++){
-            for(list<int>::iterator it = this->listaAdj[i].begin(); it != this->listaAdj[i].end(); it++ ){
-                if( (*it) > i){
-                    
-                }else{
-                    
-                }
-            } 
-        }
-        while(existemArestasInexploradas e que possuem vertices visitados){
-            
-        }        
-        
     }else if(tipoGrafo == grafoMatriz){
         
-        //gera um array de arestas n/2
-        for(int i = 0; i< this->nVertices ;i++){  
-            int count=0;
-            for(int j = 0; j< this->nVertices ;j++){
-                //percorre apenas a matrix superior
-                if (j <= i)continue;
-                //cria um array de arestas inexploradas.                
-                if (matriz[i][j] == 1){
-                    if(i == raiz|| j == raiz) countAtual = count;
-                    arestasExploradas[count][0] = i;
-                    arestasExploradas[count][1] = j;
-                    arestasExploradas[count][2] = 0; //false. n explorada
-                    count++;
-                }
-            }            
+        if(this->matriz[v][v] == -1) {cout <<"Vertice inexitente" ;return;}
+        if (flag==true){
+            delete this->visitados;
+            this->visitados = new vector<bool>(this->nVertices);
+            cout<< "-------------Busca Em Profundidade Recursiva-------------"<< endl; 
         }
+         cout << "Visitando vertice " << v+1 << "...\n";  
         
-        
-        
-        
-        //percorre todas as arestas feitas anteriormente
-        for(int i=0; i < m ;i++){
-            //checa se a aresta não foi explorada e 
-            //o primeiro vertice da aresta foi visitado .
-            if(arestasExploradas[i][2]== 0 and
-               (visitados[arestasExploradas[i][0]] == true)||
-               (visitados[arestasExploradas[i][1]] == true)){
-                
-            }
-            for(int j = 0; j< this->nVertices ;j++){
-                //percorre apenas a matrix superior
-                if (j <= verticeAtual)continue;
-                                
-                if (matriz[verticeAtual][j] == 1){
-                    arestasExploradas[verticeAtual][j] = true;
-                }
-                if (!visitados[j]){
-                    visitados[j]=true;
-                    
-                    int* aresta = new int[2];
+        for (int j =0; j< this->nVertices; j++){
+            if(( v < j && this->matriz[v][j]==1) || ( j < v && this->matriz[j][v]==1)){                    
+                int* aresta = new int[2];
+                aresta[0] = v;
+                aresta[1] = j;
+                cout << "Explorando aresta ( " << aresta[0]+1 << ","<<aresta[1]+1 << ")\n";
+                    this->arestasExploradas.push_back(aresta); 
+                                     
+                if((*this->visitados)[j]==false){       
                     aresta[0] = v;
-                    aresta[1] = *it;
-                    arestasDescobertas = ;
+                    aresta[1] = j;
+                    this->arestasDescobertas.push_back(aresta);
+                    cout << "Aresta de descoberta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                    (*this->visitados)[j] = true;
+                    BuscaEmProfundidadeRec(j,false);
+                    
                 }
-            }            
+            }    
         }
-               
-        
     }
-    
-    return visitados;
-         
 }
-*/
+
+
+
+
 
 void  Grafo::buscaCompleta(int r){
     int raiz = r;
-   
+    bool restaAlgumVert =false;
+    
+    int v = raiz;
+    int n = this->nVertices;
+    int m = this->mArestas;
+    bool visitados[n];
+    list<int*>::iterator it2;    
+    for(int i = 0; i < n; i++)
+        visitados[i] = false;
     
     vector<bool>::iterator it;
-    
+    cout<< "------------------Busca Completa-------------------------" << endl;  
     do {
-        BuscaEmProfundidade(raiz);
-        it  = find(this->visitados->begin(), this->visitados->end(),false);
         
-    }while(it !=this->visitados->end());
-    
-    
-}
+        
+        
+        
+        
+        stack<int> pilha;         
 
+        bool achou;
+        cout<< "------------- Raiz = "<< v+1 << endl<< "--------";
+        if (tipoGrafo == grafoLista ){
+            if (this->listaAdj[v].front() != -1){
+                while(true){
+                    if(!visitados[v]){
+
+                        cout << "Visitando vertice " << v+1 << "...\n";
+                        visitados[v] = true;
+                        //empilha primeiro vértice.
+                        pilha.push(v);
+                    }
+
+                    achou= false;
+
+                    list<int>::iterator it;
+
+
+                    for (it = this->listaAdj[v].begin(); it != this->listaAdj[v].end(); it++)
+                    {
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = *it;
+
+                        //verifica se a aresta já foi explorada
+                            it2 = arestasExploradas.begin();
+                            while(it2!=arestasExploradas.end()){
+                               if ( ( (*it2)[0] == v && (*it2)[1] == *it) ||  
+                                   ( (*it2)[0] == *it) && (*it2)[1] == v)  break; 
+                               it2++; 
+                            }
+
+                            if(it2==arestasExploradas.end()){  
+                                int* aresta = new int[2];
+                                aresta[0] = v;
+                                aresta[1] = *it;                          
+                                arestasExploradas.push_back(aresta);
+                                cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+
+                                if(!visitados[*it]){           
+                                    cout << "aresta de descoberta: ( " << aresta[0]+1 << "," <<aresta[1]+1 << ")\n";
+                                    this->arestasDescobertas.push_back(aresta);                
+                                    achou = true;
+                                    break;
+                                }
+                            }    
+
+
+
+
+                    }
+
+                    if(achou)
+                        v = * it;
+                    else {
+                        pilha.pop();
+
+                        if(pilha.empty())
+                            break;
+
+                        v = pilha.top();
+                    }
+                
+                 }
+                
+            }else{  cout <<"Vertice "<< v+1 <<"inexitente" <<endl; visitados[v]=true;}   
+        }else if(tipoGrafo == grafoMatriz ){
+            //se o vértice raiz existir
+            if(this->matriz[v][v] != -1){
+                while(true){
+                    
+                    if(!visitados[v]){
+                        cout << "Visitando vertice " << v+1 << "...\n";
+                        visitados[v] = true;
+                        //empilha primeiro vértice.
+                        pilha.push(v);
+                    }
+
+                    achou = false;
+
+                   int j;
+                   for(j =0;j< this->nVertices;j++ )  {
+
+                         if(( v < j && this->matriz[v][j]==1) || ( j < v && this->matriz[j][v]==1)){
+
+
+                            //verifica se a aresta já foi explorada
+                            it2 = arestasExploradas.begin();
+                            while(it2!=arestasExploradas.end()){
+                               if ( ( (*it2)[0] == v && (*it2)[1] == j) ||  
+                                   ( (*it2)[0] == j && (*it2)[1] == v) ) break; 
+                               it2++; 
+                            }
+
+                            if(it2==arestasExploradas.end()){  
+                                int* aresta = new int[2];
+                                aresta[0] = v;
+                                aresta[1] = j;                          
+                                arestasExploradas.push_back(aresta);
+                                cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+
+
+                                if(!visitados[j]){
+                                    cout << "Aresta de descoberta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                                    this->arestasDescobertas.push_back(aresta);   
+                                    achou = true;
+                                    break;
+                                }
+                            }
+
+
+                        }
+                    }
+
+                    if(achou)
+                        v = j;
+                    else {
+                        pilha.pop();
+
+                        if(pilha.empty())
+                            break;
+
+                        v = pilha.top();
+                    }
+
+                }
+                //coloca true no vértice para ele n ser cotado como raiz
+            }else {  cout <<"Vertice "<< v+1 <<"inexitente" <<endl; visitados[v]=true;} 
+        }
+    
+        
+        restaAlgumVert = 0;
+        for(int i = 0; i < n ; i++){
+            if(!visitados[i] ){  restaAlgumVert = true;v = i; break;}
+        }
+        
+        
+    }while( restaAlgumVert);
+    
+        delete this->visitados;
+        this->visitados = new vector<bool>(visitados,visitados+n);
+
+}
 bool Grafo::conectividade(){
         
     int raiz = 0;
@@ -549,64 +713,246 @@ bool Grafo::isArvore(){
 }
 
 
-Grafo* Grafo::ObterFlorestaGeradora(){
-    buscaCompleta(0);
-    // cria um grafo florestaGeradora
-    Grafo* florestaGeradora = new Grafo(this->tipoGrafo);
+void Grafo::ObterFlorestaGeradora(){
     
-      // insere os vértices do grafo atual no grafo florestaGeradora
-    for(int i =0; i< this->nVertices;i++){
-        florestaGeradora->insereVertice();
+    
+    
+    cout << "--------------Floresta Geradora--------------------------";
+    
+    bool restaAlgumVert =false;
+    
+    int v = 1;
+    int n = this->nVertices;
+    int m = this->mArestas;
+    bool visitados[n],vertDaArvore[n];
+    list<int*>::iterator it2;    
+    for(int i = 0; i < n; i++){
+        visitados[i] = false;
+        vertDaArvore[i] = false;
     }
-    //insere as arestas descobertas  no novo grafo florestaGeradora
-    for(list<int*>::iterator it = this->arestasDescobertas.begin(); it!= this->arestasDescobertas.end();++it){
-        florestaGeradora->insereAresta((*it)[0],(*it)[1]);
-    }
-    return florestaGeradora;
+    
+    vector<bool>::iterator it;
+    do {  
+               
+        stack<int> pilha;         
+
+        bool achou;
+        cout<< "------------- Árvore de raiz = "<< v+1 <<  "--------"<< endl;
+        if (tipoGrafo == grafoLista ){
+            if (this->listaAdj[v].front() != -1){
+                while(true){
+                    if(!visitados[v]){
+
+                       // cout << "Visitando vertice " << v+1 << "...\n";
+                        visitados[v] = true;
+                        vertDaArvore[v] = true;
+                        //empilha primeiro vértice.
+                        pilha.push(v);
+                    }
+
+                    achou= false;
+
+                    list<int>::iterator it;
+
+
+                    for (it = this->listaAdj[v].begin(); it != this->listaAdj[v].end(); it++)
+                    {
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = *it;
+
+                        //verifica se a aresta já foi explorada
+                            it2 = arestasExploradas.begin();
+                            while(it2!=arestasExploradas.end()){
+                               if ( ( (*it2)[0] == v && (*it2)[1] == *it) ||  
+                                   ( (*it2)[0] == *it) && (*it2)[1] == v)  break; 
+                               it2++; 
+                            }
+
+                            if(it2==arestasExploradas.end()){  
+                                int* aresta = new int[2];
+                                aresta[0] = v;
+                                aresta[1] = *it;                          
+                                arestasExploradas.push_back(aresta);
+                               // cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+
+                                if(!visitados[*it]){           
+                                    cout << "aresta da árvore  ( " << aresta[0]+1 << "," <<aresta[1]+1 << ")\n";
+                                    this->arestasDescobertas.push_back(aresta);                
+                                    achou = true;
+                                    break;
+                                }
+                            }    
+
+
+
+
+                    }
+
+                    if(achou)
+                        v = * it;
+                    else {
+                        pilha.pop();
+
+                        if(pilha.empty())
+                            break;
+
+                        v = pilha.top();
+                    }
+                
+                 }
+                //coloca true no vértice para ele n ser cotado como raiz
+                
+            }else{  cout <<"Vertice "<< v+1 <<"Excluido" <<endl; visitados[v]=true;}
+            
+            
+        }else if(tipoGrafo == grafoMatriz ){
+            //se o vértice raiz existir
+            if(this->matriz[v][v] != -1){
+                while(true){
+                    
+                    if(!visitados[v]){
+                        vertDaArvore[v] = true;
+                        visitados[v] = true;
+                        //empilha primeiro vértice.
+                        pilha.push(v);
+                    }
+
+                    achou = false;
+
+                   int j;
+                   for(j =0;j< this->nVertices;j++ )  {
+
+                         if(( v < j && this->matriz[v][j]==1) || ( j < v && this->matriz[j][v]==1)){
+
+
+                            //verifica se a aresta já foi explorada
+                            it2 = arestasExploradas.begin();
+                            while(it2!=arestasExploradas.end()){
+                               if ( ( (*it2)[0] == v && (*it2)[1] == j) ||  
+                                   ( (*it2)[0] == j && (*it2)[1] == v) ) break; 
+                               it2++; 
+                            }
+
+                            if(it2==arestasExploradas.end()){  
+                                int* aresta = new int[2];
+                                aresta[0] = v;
+                                aresta[1] = j;                          
+                                arestasExploradas.push_back(aresta);
+                                
+
+                                if(!visitados[j]){
+                                    cout << "aresta da árvore  ( " << aresta[0]+1 << "," <<aresta[1]+1 << ")\n";
+                                    this->arestasDescobertas.push_back(aresta);   
+                                    achou = true;
+                                    break;
+                                }
+                            }
+
+
+                        }
+                    }
+
+                    if(achou)
+                        v = j;
+                    else {
+                        pilha.pop();
+
+                        if(pilha.empty())
+                            break;
+
+                        v = pilha.top();
+                    }
+
+                }
+                //coloca true no vértice para ele n ser cotado como raiz
+            }else {  cout <<"Vertice "<< v+1 <<"inexitente" <<endl; visitados[v]=true;} 
+        }
+    
+        
+        restaAlgumVert = 0;
+        for(int i = 0; i < n ; i++){
+            //testa quais são os vértices da arvore
+            
+            //verifica se algum vértice n foi visitado, se sim  significa q o grafo n é conexo
+            if(!visitados[i] ){  restaAlgumVert = true;v = i; break;}
+        }
+        
+        for(int i = 0; i < n; i++){
+            
+            if((vertDaArvore[i]) && ((this->matriz != NULL && this->matriz[i][i] != -1) ||
+                    (this->listaAdj!= NULL &&  this->listaAdj[i].front() != -1) )){
+                
+                cout << "vértice da árvore: " << i+1 << endl;
+            }
+            vertDaArvore[i] = false;
+        }
+    }while( restaAlgumVert);
+    
+        
+
+    
+
 }
 
-vector<int> Grafo::determinarDistancias(int raiz){                
-    queue<int*> fila;
+vector<int>* Grafo::determinarDistancias(int raiz){                
+   
     int nivel=1, v = raiz, n= this->nVertices;
+     queue<int> fila;
+    queue<int> filaNiveis;    
     bool visitados[n];
-    vector<int> distancia;    
+    vector<int>* distancia = new vector<int>(n);    
     list<int*>::iterator it2;
 
     for(int i = 0; i < n; i++)
         visitados[i] = false;
             
-    fila.push(new int[2]{v,nivel});
+   filaNiveis.push(nivel);
     
     //marca o vertice v como visitado
-    cout << "Visitando vertice " << v << "\n";
+    cout << "Visitando vertice " << v+1 << "\n";
     visitados[v] = true;
-    
     if (tipoGrafo == grafoLista){
         while(true){
-            
-            
+                       
             list<int>::iterator it;
             //visita todos os filhos de v
             for (it = this->listaAdj[v].begin(); it != listaAdj[v].end(); it++)
             {
-                int* aresta = new int[2];
-                aresta[0] = v;
-                aresta[1] = *it; 
-                //se o vertice n foi visitado, visite ele e descubra a aresta
-                 if(!visitados[*it]){
-                    cout << "Visitando vertice " << *it << "\n";
-                    visitados[*it] = true;
-                    //coloca os filhos de v na fila com os seus níveis
-                    fila.push(new int[2]{*it,nivel++});
-                    this->arestasDescobertas.push_back(aresta);
-                    distancia[v]=nivel;
-                }
+               
                 //se a aresta ainda n foi explorada, explore-a
-                it2 = find (this->arestasExploradas.begin(), this->arestasExploradas.end(), aresta); 
-                if(it2!=this->arestasExploradas.end()){  
-                    this->arestasExploradas.push_back(aresta);
-                    cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
-                }          
+                //verifica se a aresta já foi explorada
+                    it2 = arestasExploradas.begin();
+                    while(it2!=arestasExploradas.end()){
+                       if ( ( (*it2)[0] == v && (*it2)[1] == *it) ||  
+                           ( (*it2)[0] == *it) && (*it2)[1] == v)  break; 
+                       it2++; 
+                    }
+                    
+                    if(it2==arestasExploradas.end()){
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = *it;    
+                        arestasExploradas.push_back(aresta);
+                        //cout << "Explorando aresta ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                          
+                       
+                    
+                        if(!visitados[*it]){
+                           // cout << "Visitando vertice " << *it+1 << "\n";
+                            cout << "Distancia vertice " << *it+1 <<" =" << nivel << "\n";
+                            (*distancia)[*it]=nivel;
+                            visitados[*it] = true;
+                            //coloca os filhos de v na fila para serem explorados
+                            fila.push(*it);
+                            arestasDescobertas.push_back(aresta);
+                            nivel++;
+                            filaNiveis.push(nivel);  
+                            
+                            
+                           // cout << "aresta de descoberta: ( " << aresta[0]+1 << ","<< aresta[1]+1 << ")\n";
+                         }
+                    }           
                 
                
                 
@@ -614,47 +960,53 @@ vector<int> Grafo::determinarDistancias(int raiz){
 
             if(!fila.empty()){
                 //passa a explorar os filhos de determinado vertice q foi enfileirado antes
-                v = fila.front()[0];
-                nivel = fila.front()[1];
+                v = fila.front();
                 fila.pop();
+                nivel = filaNiveis.front();
+                filaNiveis.pop();
             } else {
                 //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
                 break;
             }
         }
-        
     }else if(tipoGrafo == grafoMatriz){
         while(true){
-            for(int j =0;j< this->nVertices;j++ ){
-                
-                
-                //se houver aresta
-                if(this->matriz[v][j]==1){
+          
+            for(int j =0;j< this->nVertices;j++ ){                
+                if(this->matriz[j][j] == -1) continue;
+                //verifica se há aresta ( como a tabela matriz está preenchida soh na parte de cima
+                // foi preciso verificar onde está marcado a aresta)
+                if(( v < j && this->matriz[v][j]==1) || ( j < v && this->matriz[j][v]==1)){
                     
                     //explora a aresta
-                    int* aresta = new int[2];
-                    aresta[0] = v;
-                    aresta[1] = j;    
-                    arestasExploradas.push_back(aresta);
-                    cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] <<")\n";
-                       
                     
-                    if(!visitados[j]){
-                        cout << "Visitando vertice " << j << "\n";
-                        visitados[j] = true;
-                        
-                         //coloca os filhos de v na fila com os seus níveis
-                        //COLOCA O NIVEL DE DETERMINADO VERTICE NO VETOR
-                        
-                        fila.push(new int[2]{j,nivel++});
-                        this->arestasDescobertas.push_back(aresta);
-                        distancia[v]=nivel;
-                     }
                     
-                    it2 = find (arestasExploradas.begin(), arestasExploradas.end(), aresta); 
-                    if(it2!=arestasExploradas.end()){  
+                    //verifica se a aresta já foi explorada
+                    it2 = arestasExploradas.begin();
+                    while(it2!=arestasExploradas.end()){
+                       if ( ( (*it2)[0] == v && (*it2)[1] == j) ||  
+                           ( (*it2)[0] == j) && (*it2)[1] == v)  break; 
+                       it2++; 
+                    }
+                    
+                    if(it2==arestasExploradas.end()){
+                        int* aresta = new int[2];
+                        aresta[0] = v;
+                        aresta[1] = j;    
                         arestasExploradas.push_back(aresta);
-                        cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
+                        
+                                     
+                    
+                        if(!visitados[j]){
+                            // cout << "Visitando vertice " << *it+1 << "\n";                            
+                            (*distancia)[j]=nivel;
+                            visitados[j] = true;
+                            //coloca os filhos de v na fila para serem explorados
+                            fila.push(j);
+                            arestasDescobertas.push_back(aresta);
+                            nivel++;
+                            filaNiveis.push(nivel);
+                         }
                     }  
                     
                 }
@@ -662,19 +1014,111 @@ vector<int> Grafo::determinarDistancias(int raiz){
             }
             if(!fila.empty()){
                 //passa a explorar os filhos de determinado vertice q foi enfileirado antes
-                v     = fila.front()[0];
-                nivel = fila.front()[1];
-                //limpa a regiao alocada
-                delete &fila.front();
+                  v = fila.front();
                 fila.pop();
-                
+                nivel = filaNiveis.front();
+                filaNiveis.pop();
             } else {
                 //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
                 break;
             }
         }
     }
-    
+//    if (tipoGrafo == grafoLista){
+//        while(true){
+//            
+//            
+//            list<int>::iterator it;
+//            //visita todos os filhos de v
+//            for (it = this->listaAdj[v].begin(); it != listaAdj[v].end(); it++)
+//            {
+//                int* aresta = new int[2];
+//                aresta[0] = v;
+//                aresta[1] = *it; 
+//                //se o vertice n foi visitado, visite ele e descubra a aresta
+//                 if(!visitados[*it]){
+//                    cout << "Visitando vertice " << (*it)+1 << "\n";
+//                    visitados[*it] = true;
+//                    //coloca os filhos de v na fila com os seus níveis
+//                    nivel++;
+//                    fila.push(new int[2]{*it,nivel});                    
+//                    this->arestasDescobertas.push_back(aresta);
+//                    (*distancia)[*it]=nivel;
+//                }
+//                //se a aresta ainda n foi explorada, explore-a
+//                it2 = find (this->arestasExploradas.begin(), this->arestasExploradas.end(), aresta); 
+//                if(it2!=this->arestasExploradas.end()){  
+//                    this->arestasExploradas.push_back(aresta);
+//                    cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
+//                }          
+//                
+//               
+//                
+//            }
+//
+//            if(!fila.empty()){
+//                //passa a explorar os filhos de determinado vertice q foi enfileirado antes
+//                v = fila.front()[0];
+//                nivel = fila.front()[1];
+//                fila.pop();
+//            } else {
+//                //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
+//                break;
+//            }
+//        }
+//        
+//    }else if(tipoGrafo == grafoMatriz){
+//        while(true){
+//            for(int j =0;j< this->nVertices;j++ ){
+//                
+//                
+//                //se houver aresta
+//                if(this->matriz[v][j]==1){
+//                    
+//                    //explora a aresta
+//                    int* aresta = new int[2];
+//                    aresta[0] = v;
+//                    aresta[1] = j;    
+//                    arestasExploradas.push_back(aresta);
+//                    cout << "Explorando aresta ( " << aresta[0] << "," << aresta[1] <<")\n";
+//                       
+//                    
+//                    if(!visitados[j]){
+//                        cout << "Visitando vertice " << j+1 << "\n";
+//                        visitados[j] = true;
+//                        nivel++;
+//                         //coloca os filhos de v na fila com os seus níveis
+//                        //COLOCA O NIVEL DE DETERMINADO VERTICE NO VETOR
+//                        
+//                        fila.push(new int[2]{j,nivel});
+//                        this->arestasDescobertas.push_back(aresta);
+//                        (*distancia)[j]=nivel;
+//                     }
+//                    
+//                    it2 = find (arestasExploradas.begin(), arestasExploradas.end(), aresta); 
+//                    if(it2!=arestasExploradas.end()){  
+//                        arestasExploradas.push_back(aresta);
+//                        cout << "Explorando aresta ( " << aresta[0] << "," << aresta[1] << ")\n";
+//                    }  
+//                    
+//                }
+//
+//            }
+//            if(!fila.empty()){
+//                //passa a explorar os filhos de determinado vertice q foi enfileirado antes
+//                v     = fila.front()[0];
+//                nivel = fila.front()[1];
+//                //limpa a regiao alocada
+//                
+//                fila.pop();
+//                
+//            } else {
+//                //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
+//                break;
+//            }
+//        }
+//    }
+//    
     
     delete this->visitados;
     this->visitados = new vector<bool>(visitados,visitados+n);
@@ -775,7 +1219,7 @@ vector<int> Grafo::vertVizinhos(int v){
  void  Grafo::RemoveVertice(int v){
     v--;
     if(tipoGrafo == grafoMatriz ){
-       this->matriz[v][v]=-1;  
+       this->matriz[v][v]= -1;  
        
           
             

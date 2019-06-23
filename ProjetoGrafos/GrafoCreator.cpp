@@ -69,6 +69,9 @@ void criarGrafos(){
                    vertJaUsad.push_back(verticeB);
                    JSONArq["arestas"][j][0] = verticeA;
                    JSONArq["arestas"][j][1] = verticeB;
+                   
+                   //define os pesos das arestas entre 1 e 100
+                   JSONArq["arestas"][j][2] = rand() % (100) + 1;
                }
           }
           

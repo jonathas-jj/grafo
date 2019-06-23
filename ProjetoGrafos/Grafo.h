@@ -30,13 +30,15 @@ public:
     Grafo(const Grafo& orig);
     virtual     ~Grafo();//feito
    
-    
+    //manipulação de arquivos JSON
     void        criaGrafo(int vertices, int mAresta, int ** arestas);//feito
     void        criaGrafoJSON(int nVertices, int mArestas, Json::Value raiz);
     
     //Info do grafo
     string      imprimeGrafo();//feito
     vector<int> vertVizinhos(int v);
+    friend ostream& operator<<(ostream& strm,  Grafo& g); 
+    int tipoGrafo;
     
     //manipulacao do grafo    
     void        RemoveAresta(int v1, int v2);
@@ -46,19 +48,23 @@ public:
 //algoritmos de busca    
     void        buscaEmLargura(int raiz);
     void        BuscaEmProfundidade(int raiz);
-    bool *      busca(int raiz);
+   
     void        buscaCompleta(int r);
     bool        conectividade();
     bool        temCiclo();
     bool        isFloresta();
     bool        isArvore();
-    Grafo*      ObterFlorestaGeradora();    
-    void        BuscaEmProfundidadeRec(int raiz,bool flag=true);
-    void        BuscaEmLarguraRec(int raiz,bool flag);
-    vector<int> determinarDistancias(int raiz);
+    void        ObterFlorestaGeradora();    
+    void        BuscaEmProfundidadeRec(int raiz,bool flag=true);   
+    vector<int>* determinarDistancias(int raiz);
     
-    friend ostream& operator<<(ostream& strm,  Grafo& g); 
-    int tipoGrafo;
+    
+    
+    
+    // estrutura de dados publica.
+    vector<bool>* visitados; //vertices visitados
+    list<int *> arestasExploradas ;//arestas exploradas
+    list<int *> arestasDescobertas; //arestas descobertas
  
 private:
     
@@ -66,11 +72,8 @@ private:
     int nVertices, mArestas;
     list<int> *listaAdj; // apontará para um vetor com ponteiro pro inicio das listas 
     //lista de adjacencia
-    stack<int>pilhaDeBusca;
-    queue<int>filaDeBusca;
-    vector<bool>* visitados; //vertices visitados
-    list<int *> arestasExploradas ;//arestas exploradas
-    list<int *> arestasDescobertas; //arestas descobertas
+    
+    
        
     
     

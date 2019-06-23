@@ -24,6 +24,9 @@ using namespace std;
 /*
  * 
  */
+
+int buscaGrafos(Grafo *g);
+
 void abreArq(string s, Grafo *g){
      int n=0,m=0;
     fstream arq(s);
@@ -78,7 +81,7 @@ int main() {
         cout <<"Digite 5 para adicionar aresta"<<endl;
         cout <<"Digite 6 para imprimir grafo"<<endl;
         cout <<"Digite 7 para ler outro arquivo json"<<endl;
-        cout <<"Digite 8 para executar a busca no grafo."<<endl;
+        cout <<"Digite 8 para executar alguma busca no grafo."<<endl;
         cin >> opcao;
        
         
@@ -145,15 +148,18 @@ int main() {
         
             cin>>nDoGrafo;
             cout << "\nDigite o tipo de grafo(matriz = 1, lista = 2):" ;
+            
             cin>>tipoGrafo;
+           
             delete g;
+            
             g = new Grafo(tipoGrafo);
             //abre arquivo JSON e joga no objeto grafo com o tipo desejado
             abreArq("dados/grafoN"+to_string(nDoGrafo)+".json",  g);
             //imprime o grafo
             cout << *g ;
         }else if(opcao==8){
-              //buscaGrafos();      
+              buscaGrafos(g);      
             
         
         }else if(opcao==9){
@@ -166,6 +172,78 @@ int main() {
     return 0;
 }
 
-int buscaGrafos(){
- 
+int buscaGrafos(Grafo *g){
+    int opcao;              
+    cout <<"Digite 1 para realizar a busca em largura"<<endl;                   
+    cout <<"Digite 2 para realizar a busca em profundidade"<<endl;                   
+    cout <<"Digite 3 para realizar a busca Completa"<<endl;                   
+    cout <<"Digite 4 para testar a conextividade"<<endl;
+    cout <<"Digite 5 para testar se tem ciclo"<<endl;
+    cout <<"Digite 6 para testar se é floresta"<<endl;
+    cout <<"Digite 7  para testar se é árvore "<<endl;    
+    cout <<"Digite 8 para encontrar uma floresta geradora."<<endl;
+    cout <<"Digite 9  para realizar a Busca em Profundidade Recursiva"<<endl; 
+    cout <<"Digite 10 para determinar as Distancias a partir de um vértice ."<<endl;
+    cin >> opcao;
+        
+    if( opcao==1 ){
+        int raiz;
+        cout <<"Digite a raiz "<<endl;
+        cin >> raiz;
+        g->buscaEmLargura(raiz-1);
+    }
+    else if( opcao==2 ){ 
+        int raiz;
+        cout <<"Digite a raiz "<<endl;
+        cin >> raiz;
+        g->BuscaEmProfundidade(raiz-1);
+    
+    }   
+    else if( opcao==3 ){
+        int raiz;
+        cout <<"Digite a raiz "<<endl;
+        cin >> raiz;
+        g->buscaCompleta(raiz-1);
+    }
+    else if( opcao==4 ){
+        if (g->conectividade()){
+            cout << "Grafo é conexo"<<endl;
+        }else cout << "Grafo NÂO é conexo!"<<endl;
+    }
+    else if( opcao==5 ){
+        if (g->temCiclo()){
+            cout << "Grafo  tem ciclo!"<<endl;
+        }else cout << "Grafo NÂO tem ciclo!"<<endl;
+    }
+    else if( opcao==6 ){
+         if (g->isFloresta()){
+             cout << "Grafo é floresta!"<<endl;
+         }else cout << "Grafo NÂO é floresta!"<<endl;
+    }
+    else if( opcao==7 ){
+        if (g->isArvore()){
+            cout << "Grafo é árvore!"<<endl;
+         }else cout << "Grafo NÂO é árvore!"<<endl;
+    }
+    else if( opcao==8 ){
+
+        g->ObterFlorestaGeradora() ;
+       
+    }    
+    else if( opcao==9 ){  
+        int raiz;
+        cout <<"Digite a raiz "<<endl;
+        cin >> raiz;
+        g->BuscaEmProfundidadeRec(raiz-1);
+    }    
+    else if(opcao==10 ){
+        int raiz;
+        cout <<"Digite a raiz "<<endl;
+        cin >> raiz;
+        vector<int>* discancias = g->determinarDistancias(raiz-1);
+        for(vector<int>::iterator it = discancias->begin() ; it < discancias->end() ; it++){
+            cout << "Distancia  do vertice " << ( it - discancias->begin() )+1 <<" =" << (*it) << "\n";
+        }
+        delete discancias;
+    }
 }
