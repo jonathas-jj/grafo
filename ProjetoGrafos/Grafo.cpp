@@ -102,7 +102,7 @@ int Grafo::insereVertice(){
             listAux[i] = this->listaAdj[i];
 
         }
-        
+        delete[] this->listaAdj;
         this->listaAdj = listAux;
         
     }
@@ -120,15 +120,24 @@ void Grafo::criaGrafo(int nVertices, int mArestas, int ** arestas ){
     
     if(tipoGrafo == grafoMatriz ){
          this->matriz = new int *[nVertices];
+         this->pesoArestas = new ArestasPeso [mArestas];
+         
         for(int i = 0; i < nVertices; i++){
             this->matriz[i] = new int[nVertices];
         }
-         //preenhe matriz cm arestas.
+        
+        //preenhe matriz cm arestas.
         for (int i = 0; i < mArestas; i++){
             int verticeA = arestas[i][0]-1, verticeB = arestas[i][1]-1;
+            
+            pesoArestas[i].v1 =  verticeA;
+            pesoArestas[i].v2 =  verticeB;
+            pesoArestas[i].peso =  arestas[i][2];
+            
             //preenche apenas a parte de cima da matriz
             if(verticeA <= verticeB){ 
                 this->matriz[verticeA][verticeB] = 1 ;
+                
             }else{
                 this->matriz[verticeB][verticeA] = 1 ;
             }
@@ -1024,101 +1033,7 @@ vector<int>* Grafo::determinarDistancias(int raiz){
             }
         }
     }
-//    if (tipoGrafo == grafoLista){
-//        while(true){
-//            
-//            
-//            list<int>::iterator it;
-//            //visita todos os filhos de v
-//            for (it = this->listaAdj[v].begin(); it != listaAdj[v].end(); it++)
-//            {
-//                int* aresta = new int[2];
-//                aresta[0] = v;
-//                aresta[1] = *it; 
-//                //se o vertice n foi visitado, visite ele e descubra a aresta
-//                 if(!visitados[*it]){
-//                    cout << "Visitando vertice " << (*it)+1 << "\n";
-//                    visitados[*it] = true;
-//                    //coloca os filhos de v na fila com os seus níveis
-//                    nivel++;
-//                    fila.push(new int[2]{*it,nivel});                    
-//                    this->arestasDescobertas.push_back(aresta);
-//                    (*distancia)[*it]=nivel;
-//                }
-//                //se a aresta ainda n foi explorada, explore-a
-//                it2 = find (this->arestasExploradas.begin(), this->arestasExploradas.end(), aresta); 
-//                if(it2!=this->arestasExploradas.end()){  
-//                    this->arestasExploradas.push_back(aresta);
-//                    cout << "Explorando aresta ( " << aresta[0] << ","+aresta[1] << ")\n";
-//                }          
-//                
-//               
-//                
-//            }
-//
-//            if(!fila.empty()){
-//                //passa a explorar os filhos de determinado vertice q foi enfileirado antes
-//                v = fila.front()[0];
-//                nivel = fila.front()[1];
-//                fila.pop();
-//            } else {
-//                //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
-//                break;
-//            }
-//        }
-//        
-//    }else if(tipoGrafo == grafoMatriz){
-//        while(true){
-//            for(int j =0;j< this->nVertices;j++ ){
-//                
-//                
-//                //se houver aresta
-//                if(this->matriz[v][j]==1){
-//                    
-//                    //explora a aresta
-//                    int* aresta = new int[2];
-//                    aresta[0] = v;
-//                    aresta[1] = j;    
-//                    arestasExploradas.push_back(aresta);
-//                    cout << "Explorando aresta ( " << aresta[0] << "," << aresta[1] <<")\n";
-//                       
-//                    
-//                    if(!visitados[j]){
-//                        cout << "Visitando vertice " << j+1 << "\n";
-//                        visitados[j] = true;
-//                        nivel++;
-//                         //coloca os filhos de v na fila com os seus níveis
-//                        //COLOCA O NIVEL DE DETERMINADO VERTICE NO VETOR
-//                        
-//                        fila.push(new int[2]{j,nivel});
-//                        this->arestasDescobertas.push_back(aresta);
-//                        (*distancia)[j]=nivel;
-//                     }
-//                    
-//                    it2 = find (arestasExploradas.begin(), arestasExploradas.end(), aresta); 
-//                    if(it2!=arestasExploradas.end()){  
-//                        arestasExploradas.push_back(aresta);
-//                        cout << "Explorando aresta ( " << aresta[0] << "," << aresta[1] << ")\n";
-//                    }  
-//                    
-//                }
-//
-//            }
-//            if(!fila.empty()){
-//                //passa a explorar os filhos de determinado vertice q foi enfileirado antes
-//                v     = fila.front()[0];
-//                nivel = fila.front()[1];
-//                //limpa a regiao alocada
-//                
-//                fila.pop();
-//                
-//            } else {
-//                //se a fila tiver vazia é pq o algoritmo já percorreu todos os vértices
-//                break;
-//            }
-//        }
-//    }
-//    
+
     
     delete this->visitados;
     this->visitados = new vector<bool>(visitados,visitados+n);
@@ -1203,6 +1118,85 @@ vector<int> Grafo::vertVizinhos(int v){
 
 }
 
+void  Grafo::dijkstra(int orig){
+    int n = this->nVertices;
+    int dist[n];
+    int visitados[n];
+    int caminho[n];
+    int i = 0;
+    cout << "dsa"; 
+    for(int i = 0; i < n; i++){
+        dist[i] = 10000000;
+        visitados[i] = false;
+        caminho[i]= -1;
+    }
+    
+    dist[orig-1] = 0;
+    
+    if(tipoGrafo == grafoLista){
+                
+        
+        while(binary_search(visitados,visitados+n,false)){
+            int *min;int peso;
+            
+            min = std::min_element( dist, dist + n ); 
+           
+            for (list<int>::iterator it = this->listaAdj[min - dist].begin();
+                    it != this->listaAdj[min - dist].end(); ++it){
+                
+                peso = procuraPeso(min-dist, *it);
+                if(dist[*it] > (dist[*it] + peso)){
+                    dist[*it] = dist[ min - dist] + peso ;
+                    caminho[*it] = *min;
+                }
+
+                
+            }    
+        }
+//        
+    }else if(tipoGrafo == grafoMatriz){
+        while(binary_search(visitados,visitados+n,false)){
+            int *min;int peso;
+        
+            min = std::min_element( dist, dist + n ); 
+            int i = ( min - dist);
+            visitados[i] = true;
+            for (int j = 0 ; j < this-> nVertices ;j++){
+                if(( i < j && this->matriz[i][j]==1) || ( j < i && this->matriz[j][i]==1)){
+                   
+                     peso = procuraPeso(i, j);
+                    if(dist[j] > dist[j] + peso){
+                        dist[j] = dist[ i] + peso ;
+                        caminho[j] = *min;
+                        
+                    }
+                }            
+                
+            }    
+        }
+    }
+    cout << "Distancias dos vértices ao vértice de origem" <<endl;
+    for(int i = 0; i < n; i++){
+        cout << dist[i]<< ", ";
+    }
+
+}
+
+int Grafo::procuraPeso(int v1, int v2){
+    int Achado = 0 ;
+    for(int i = 0; i< this->mArestas ;i++){
+        if((this->pesoArestas[i].v1 == v1 && this->pesoArestas[i].v2== v2 )||
+                (this->pesoArestas[i].v1 == v2 && this->pesoArestas[i].v2== v1)){
+            Achado = pesoArestas[i].peso;
+        }
+    }
+    
+    return Achado;
+}
+int  Grafo::getNumAresta(){
+    return this->mArestas;
+}
+
  void  Grafo::RemoveAresta(int v1, int v2 ){
      v1--;v2--;
      if(tipoGrafo == grafoMatriz ){
@@ -1235,3 +1229,35 @@ vector<int> Grafo::vertVizinhos(int v){
     }
      
  }
+ //void Grafo::Floyd(int **arestas, int n, int mArestas){
+    //int** matriz;
+    //int** matrizAnt;
+    //int *min;
+
+    //for(int i = 0; i < n; i++){
+        //for(int j = 0; j < n; j++){
+            //if(i == j){
+                //matriz[i][j] = 0;
+            //} else {                
+                //matriz[i][j] = 999999999;
+            //}
+        //}
+    //}
+
+    //for(int i = 0; i < mArestas; i++){
+        //if(arestas[i][0] != arestas[i][1]){
+            //matriz[arestas[i][0]][arestas[i][1]] = arestas[i][2]; //rand() % 50 + 1;
+        //}
+    //}
+
+    //for(int k = 0; k < n; k++){
+        //matrizAnt = matriz;
+        //for(int i = 0; i < n; i++){
+            //for(int j = 0; j < n; j++){
+
+                //if(matriz[i][j] > matrizAnt[i][k] + matrizAnt[k][j]){
+                     //matrizAnt[i][j] = matrizAnt[i][k] + matrizAnt[k][j];
+                //}
+            //}
+        //}
+    //}

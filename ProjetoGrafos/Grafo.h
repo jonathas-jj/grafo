@@ -21,7 +21,11 @@
 #include <iostream>
 #include <jsoncpp/json/json.h>
 using namespace std;
-
+struct ArestasPeso{
+    int v1;
+    int v2;
+    int peso;
+};
 
 class Grafo {
 public:
@@ -37,6 +41,8 @@ public:
     //Info do grafo
     string      imprimeGrafo();//feito
     vector<int> vertVizinhos(int v);
+    
+     int        getNumAresta();
     friend ostream& operator<<(ostream& strm,  Grafo& g); 
     int tipoGrafo;
     
@@ -58,8 +64,10 @@ public:
     void        BuscaEmProfundidadeRec(int raiz,bool flag=true);   
     vector<int>* determinarDistancias(int raiz);
     
-    
-    
+//caminhos minimos       
+    void         dijkstra(int orig);
+    int procuraPeso(int v1, int v2);
+    //void Floyd(int **arestas, int n, int mArestas);
     
     // estrutura de dados publica.
     vector<bool>* visitados; //vertices visitados
@@ -70,7 +78,8 @@ private:
     
     int ** matriz;
     int nVertices, mArestas;
-    list<int> *listaAdj; // apontará para um vetor com ponteiro pro inicio das listas 
+    list<int> *listaAdj;
+    ArestasPeso *pesoArestas;// apontará para um vetor com ponteiro pro inicio das listas 
     //lista de adjacencia
     
     

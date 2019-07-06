@@ -184,7 +184,9 @@ int buscaGrafos(Grafo *g){
     cout <<"Digite 8 para encontrar uma floresta geradora."<<endl;
     cout <<"Digite 9  para realizar a Busca em Profundidade Recursiva"<<endl; 
     cout <<"Digite 10 para determinar as Distancias a partir de um vértice ."<<endl;
-    cin >> opcao;
+    cout << "Digite 11  para realizar o algoritmo de dijkstra"<<endl; 
+    cout << "Digite 12 para determinar o algoritmo de floyd "<<endl;
+    cin  >> opcao;
         
     if( opcao==1 ){
         int raiz;
@@ -245,5 +247,19 @@ int buscaGrafos(Grafo *g){
             cout << "Distancia  do vertice " << ( it - discancias->begin() )+1 <<" =" << (*it) << "\n";
         }
         delete discancias;
+    }else if(opcao==11 ){
+        int raiz;
+        cout <<"Digite a raiz "<<endl;
+        cin >> raiz;
+        cout<<"12321";
+        g->dijkstra(raiz);
+        
+      
+    }else if(opcao==12 ){
+        //int raiz;
+        //cout <<"Digite a raiz "<<endl;
+        
+        //g->Floyd();     
     }
 }
+
